@@ -5,39 +5,7 @@
 
 ## Implementación de un Analizador Sintáctico de Descenso Recursivo
 
-### Estructura del directorio
-```c++
-p3
-├── README.md
-└── src //carpeta de código
-    ├── headers
-    │   ├── Lexer.hpp   //header de la clase Lexer
-    │   ├── Parser.hpp  //header de la clase Parser
-    │   └── Symbols.hpp //definición de símbolos
-    ├── lexer.ll        //definición del an. léxico
-    ├── main.cpp        //contiene la función principal del programa
-    ├── Makefile        //boceto de Makefile (no funciona aún)
-    ├── Parser.cpp      //código fuente de la clase Parser
-    └── prueba          ////archivo de entrada para el analizador (léxico y sintáctico)
-```
-
-### Uso
-
-#### Compilación
-
-```bash
-$ cd src/
-$ flex++ lexer.ll
-$ g++ Lexer.cpp Parser.cpp main.cpp -o analyzer
-```
-
-#### Ejecución
-
-```bash
-$ ./analyzer prueba
-```
-
-#### Ejercicios
+### Ejercicios
 Para la gramática G = ( N, Σ, P, S), descrita por las siguientes producciones: 
 > P = {
 >> programa → declaraciones sentencias <br>
@@ -56,7 +24,7 @@ Para la gramática G = ( N, Σ, P, S), descrita por las siguientes producciones:
 
 * **Símbolo Inicial ($S$):** `programa`
 * **Terminales ($\Sigma$):** `{ int, float, ;, ,, identificador, =, if, else, while, (, ), +, -, *, /, numero }`
-* **No Terminales ($N$):** `{ programa, declaraciones, declaracion, tipo, lista_var, sentencias, sentencia, expresion }`
+* **No-Terminales ($N$):** `{ programa, declaraciones, declaracion, tipo, lista_var, sentencias, sentencia, expresion }`
 
 2. Mostrar en el archivo el proceso de eliminación de ambigüedad o justificar, en caso de no ser necesario. (1 pts.).
 
@@ -73,28 +41,29 @@ Ejemplo con `expresion`:
 
 4. Mostrar en el archivo el proceso de factorización izquierda o justificar, en caso de no ser necesario. (1 pts.)
 
-Dado que los conjuntos *First* de las producciones alternativas para cada No-Terminal son disjuntos (por ejemplo, `sentencia` puede empezar con `id`, `if` o `while`), no fue necesaria una factorización izquierda adicional.
+Dado que los conjuntos *First* de las producciones alternativas para cada No-Terminal son disjuntos, no fue necesaria una factorización izquierda adicional.
 
 5. Mostrar en el archivo los nuevos conjuntos _N_ y _P_. (0.5 pts.)
 
-**Conjunto $N$:** `{ programa, declaraciones, declaracion, tipo, lista_var, lista_var_prima, sentencias, sentencia, expresion, expresion_prima, termino, termino_prima, factor }`
+Conjunto $N$: `{ programa, declaraciones, declaracion, tipo, lista_var, lista_var_prima, sentencias, sentencia, expresion, expresion_prima, termino, termino_prima, factor }`
 
-**Conjunto $P$:**
-1.  **programa** $\to$ declaraciones sentencias
-2.  **declaraciones** $\to$ declaracion declaraciones | $\epsilon$
-3.  **declaracion** $\to$ tipo lista_var **;**
-4.  **tipo** $\to$ **int** | **float**
-5.  **lista_var** $\to$ **identificador** lista_var_prima
-6.  **lista_var_prima** $\to$ **,** **identificador** lista_var_prima | $\epsilon$
-7.  **sentencias** $\to$ sentencia sentencias | $\epsilon$
-8.  **sentencia** $\to$ **identificador** **=** expresion **;**
-    | **if** **(** expresion **)** sentencias **else** sentencias
-    | **while** **(** expresion **)** sentencias
-9.  **expresion** $\to$ termino expresion_prima
-10. **expresion_prima** $\to$ **+** termino expresion_prima | **-** termino expresion_prima | $\epsilon$
-11. **termino** $\to$ factor termino_prima
-12. **termino_prima** $\to$ **\*** factor termino_prima | **/** factor termino_prima | $\epsilon$
-13. **factor** $\to$ **(** expresion **)** | **identificador** | **numero**
+> P = {
+>>  **programa** $\to$ declaraciones sentencias <br>
+>>  **declaraciones** $\to$ declaracion declaraciones | $\epsilon$ <br>
+>>  **declaracion** $\to$ tipo lista_var **;** <br>
+>>  **tipo** $\to$ **int** | **float** <br>
+>>  **lista_var** $\to$ **identificador** lista_var_prima <br>
+>>  **lista_var_prima** $\to$ **,** **identificador** lista_var_prima | $\epsilon$ <br>
+>>  **sentencias** $\to$ sentencia sentencias | $\epsilon$ <br>
+>>  **sentencia** $\to$ **identificador** **=** expresion **;** <br>
+    | **if** **(** expresion **)** sentencias **else** sentencias <br>
+    | **while** **(** expresion **)** sentencias <br>
+>>  **expresion** $\to$ termino expresion_prima <br>
+>> **expresion_prima** $\to$ **+** termino expresion_prima | **-** termino expresion_prima | $\epsilon$ <br>
+>> **termino** $\to$ factor termino_prima <br>
+>> **termino_prima** $\to$ **\*** factor termino_prima | **/** factor termino_prima | $\epsilon$ <br>
+>> **factor** $\to$ **(** expresion **)** | **identificador** | **numero** <br>
+}
 
 6. Definir el Analizador Léxico (lexer.ll) con las acciones léxicas correspondientes. (2 pts.)
 7. Implementar el Analizador Sintáctico (Parser.cpp) de descenso recursivo, documentando las funciones de cada No-Terminal, de forma que el programa descrito en el archivo _prueba_ sea reconocido y aceptado por el analizador resultante. (4 pts.)
