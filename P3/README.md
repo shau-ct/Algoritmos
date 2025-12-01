@@ -5,47 +5,7 @@
 
 ## Implementación de un Analizador Sintáctico de Descenso Predictivo
 
-### Estructura del directorio
-```c++
-p4
-├── README.md
-└── src //carpeta de código
-    ├── prueba //archivo para I/O test
-    ├── lib //carpeta para bibliotecas
-    │   └── FlexLexer.h //archivo de cabecera (ignorar)
-    ├── Makefile //archivo de reglas de compilación
-    ├── main.cpp //contiene la función principal del programa
-    ├── Production.cpp //archivo para la clase producción
-    ├── lexer.ll //archivo de Flex para generación de `scanner`
-    ├── Symbol.cpp //archivo para la clase de símbolo
-    ├── Grammar.cpp //archivo para la clase de gramática
-    ├── ParserLL.cpp //archivo para parser LL(1)
-    └── headers //carpeta de archivos de código
-        ├── Lexer.hpp //archivo de cabecera para el scanner
-        ├── Symbol.h //archivo de cabecera de símbolo
-        ├── Production.h //archivo de cabecera de producción
-        ├── Symbols.hpp //archivo de cabecera definición de los conjuntos N y Σ
-        ├── Grammar.h //archivo de cabecera de gramática
-        └── ParserLL.hpp //archivo de cabecera del parser LL(1)
-
-```
-
-### Uso
-
-#### Compilacion
-
-```bash
-$ cd src/
-$ make
-```
-
-#### Ejecucion
-
-```bash
-$ ./compiler prueba
-```
-
-#### Ejercicios
+### Ejercicios
 Para la gramática G = ( N, Σ, P, S), descrita por las siguientes producciones: 
 > P = {
 >> programa → declaraciones sentencias <br>
@@ -76,112 +36,100 @@ Para la gramática G = ( N, Σ, P, S), descrita por las siguientes producciones:
 
     d. Mostrar en el archivo los nuevos conjuntos _N'_ y _P'_, que definen _G'_. (0.25 pts.) 
     
-    **Nuevos No Terminales ($N'$):**
-    $\{ Programa, Decls, Decls', Decl, Tipo, ListaVar, ListaVar', Sentencias, Sentencias', Sentencia, Expr, Expr', Term, Term', Factor \}$
-    
-    **Producciones ($P'$):**
-    1.  $Programa \to Decls \ Sentencias$
-    2.  $Decls \to Decl \ Decls'$
-    3.  $Decls' \to Decl \ Decls' \mid \epsilon$
-    4.  $Decl \to Tipo \ ListaVar \ \textbf{;}$
-    5.  $Tipo \to \textbf{int} \mid \textbf{float}$
-    6.  $ListaVar \to \textbf{id} \ ListaVar'$
-    7.  $ListaVar' \to \textbf{,} \ \textbf{id} \ ListaVar' \mid \epsilon$
-    8.  $Sentencias \to Sentencia \ Sentencias'$
-    9.  $Sentencias' \to Sentencia \ Sentencias' \mid \epsilon$
-    10. $Sentencia \to \textbf{id} \ \textbf{=} \ Expr \ \textbf{;}$
-    11. $Sentencia \to \textbf{if} \ \textbf{(} \ Expr \ \textbf{)} \ Sentencias \ \textbf{else} \ Sentencias$
-    12. $Sentencia \to \textbf{while} \ \textbf{(} \ Expr \ \textbf{)} \ Sentencias$
-    13. $Expr \to Term \ Expr'$
-    14. $Expr' \to \textbf{+} \ Term \ Expr' \mid \textbf{-} \ Term \ Expr' \mid \epsilon$
-    15. $Term \to Factor \ Term'$
-    16. $Term' \to \textbf{*} \ Factor \ Term' \mid \textbf{/} \ Factor \ Term' \mid \epsilon$
-    17. $Factor \to \textbf{(} \ Expr \ \textbf{)} \mid \textbf{id} \mid \textbf{num}$ <br>
+    Conjunto N': `{ Programa, Decls, Decls_prima, Decl, Tipo, ListaVar, ListaVar_prima, Sentencias, Sentencias_prima, Sentencia, Expr, Expr_prima, Term, Term_prima, Factor }`
+
+> P' = {
+>> **Programa** -> Decls Sentencias <br>
+>> **Decls** -> Decl Decls_prima <br>
+>> **Decls_prima** -> Decl Decls_prima | epsilon <br>
+>> **Decl** -> Tipo ListaVar **;** <br>
+>> **Tipo** -> **int** | **float** <br>
+>> **ListaVar** -> **id** ListaVar_prima <br>
+>> **ListaVar_prima** -> **,** **id** ListaVar_prima | epsilon <br>
+>> **Sentencias** -> Sentencia Sentencias_prima <br>
+>> **Sentencias_prima** -> Sentencia Sentencias_prima | epsilon <br>
+>> **Sentencia** -> **id** **=** Expr **;** <br>
+>> | **if** **(** Expr **)** Sentencias **else** Sentencias <br>
+>> | **while** **(** Expr **)** Sentencias <br>
+>> **Expr** -> Term Expr_prima <br>
+>> **Expr_prima** -> **+** Term Expr_prima | **-** Term Expr_prima | epsilon <br>
+>> **Term** -> Factor Term_prima <br>
+>> **Term_prima** -> ***** Factor Term_prima | **/** Factor Term_prima | epsilon <br>
+>> **Factor** -> **(** Expr **)** | **id** | **num** <br>
+> }
 
 2. Mostrar en el archivo la construcción de los conjuntos FIRST de la gramática _G'_. (1 pt.)
 
-Cálculo de los primeros símbolos que pueden derivarse de cada No Terminal.
+Cálculo de los primeros símbolos que pueden derivarse de cada No-Terminal.
 
-| No Terminal ($X$) | FIRST($X$) |
+| No-Terminal | FIRST |
 | :--- | :--- |
-| **Programa** | $\{ \textbf{int}, \textbf{float} \}$ |
-| **Decls** | $\{ \textbf{int}, \textbf{float} \}$ |
-| **Decls'** | $\{ \textbf{int}, \textbf{float}, \epsilon \}$ |
-| **Decl** | $\{ \textbf{int}, \textbf{float} \}$ |
-| **Tipo** | $\{ \textbf{int}, \textbf{float} \}$ |
-| **ListaVar** | $\{ \textbf{id} \}$ |
-| **ListaVar'** | $\{ \textbf{,}, \epsilon \}$ |
-| **Sentencias** | $\{ \textbf{id}, \textbf{if}, \textbf{while} \}$ |
-| **Sentencias'** | $\{ \textbf{id}, \textbf{if}, \textbf{while}, \epsilon \}$ |
-| **Sentencia** | $\{ \textbf{id}, \textbf{if}, \textbf{while} \}$ |
-| **Expr** | $\{ \textbf{(}, \textbf{id}, \textbf{num} \}$ |
-| **Expr'** | $\{ \textbf{+}, \textbf{-}, \epsilon \}$ |
-| **Term** | $\{ \textbf{(}, \textbf{id}, \textbf{num} \}$ |
-| **Term'** | $\{ \textbf{*}, \textbf{/}, \epsilon \}$ |
-| **Factor** | $\{ \textbf{(}, \textbf{id}, \textbf{num} \}$ |
-
----
+| **Programa** | int, float |
+| **Decls** | int, float |
+| **Decls_prima** | int, float, epsilon |
+| **Decl** | int, float |
+| **Tipo** | int, float |
+| **ListaVar** | id |
+| **ListaVar_prima** | , (coma), epsilon |
+| **Sentencias** | id, if, while |
+| **Sentencias_prima** | id, if, while, epsilon |
+| **Sentencia** | id, if, while |
+| **Expr** | (, id, num |
+| **Expr_prima** | +, -, epsilon |
+| **Term** | (, id, num |
+| **Term_prima** | *, /, epsilon |
+| **Factor** | (, id, num |
 
 3. Mostrar en el archivo la construcción de los conjuntos FOLLOW de la gramática _G'_. (1 pt.)
 
-Cálculo de los símbolos que pueden aparecer inmediatamente después de un No Terminal.
+Cálculo de los símbolos que pueden aparecer inmediatamente después de un No-Terminal.
 
-| No Terminal ($X$) | FOLLOW($X$) |
+| No-Terminal | FOLLOW |
 | :--- | :--- |
-| **Programa** | $\{ \mathbf{\$} \}$ |
-| **Decls** | $\{ \textbf{id}, \textbf{if}, \textbf{while} \}$ |
-| **Decls'** | $\{ \textbf{id}, \textbf{if}, \textbf{while} \}$ |
-| **Decl** | $\{ \textbf{int}, \textbf{float}, \textbf{id}, \textbf{if}, \textbf{while} \}$ |
-| **Tipo** | $\{ \textbf{id} \}$ |
-| **ListaVar** | $\{ \textbf{;} \}$ |
-| **ListaVar'** | $\{ \textbf{;} \}$ |
-| **Sentencias** | $\{ \mathbf{\$}, \textbf{else} \}$ |
-| **Sentencias'** | $\{ \mathbf{\$}, \textbf{else} \}$ |
-| **Sentencia** | $\{ \textbf{id}, \textbf{if}, \textbf{while}, \mathbf{\$}, \textbf{else} \}$ |
-| **Expr** | $\{ \textbf{;}, \textbf{)} \}$ |
-| **Expr'** | $\{ \textbf{;}, \textbf{)} \}$ |
-| **Term** | $\{ \textbf{+}, \textbf{-}, \textbf{;}, \textbf{)} \}$ |
-| **Term'** | $\{ \textbf{+}, \textbf{-}, \textbf{;}, \textbf{)} \}$ |
-| **Factor** | $\{ \textbf{*}, \textbf{/}, \textbf{+}, \textbf{-}, \textbf{;}, \textbf{)} \}$ |
-
----
+| **Programa** | $ (Fin de archivo) |
+| **Decls** | id, if, while |
+| **Decls_prima** | id, if, while |
+| **Decl** | int, float, id, if, while |
+| **Tipo** | id |
+| **ListaVar** | ; |
+| **ListaVar_prima** | ; |
+| **Sentencias** | $, else |
+| **Sentencias_prima** | $, else |
+| **Sentencia** | id, if, while, $, else |
+| **Expr** | ;, ) |
+| **Expr_prima** | ;, ) |
+| **Term** | +, -, ;, ) |
+| **Term_prima** | +, -, ;, ) |
+| **Factor** | *, /, +, -, ;, ) |
 
 4. Mostrar en el archivo la construcción de la tabla de análisis sintáctico predictivo para _G'_. (1 pt.)
 
-La tabla $M[N, T]$ indica qué producción utilizar dado un No Terminal en la cima de la pila y un Token de entrada.
+La tabla indica qué producción utilizar dado un No-Terminal y un Token de entrada.
 
-*(Nota: Las celdas vacías indican error de sintaxis).*
+*(Nota: Las celdas vacías indican error).*
 
-| No Term | int | float | id | num | ; | , | = | if | else | while | + | - | * | / | ( | ) | $ |
+| No-Terminal | int | float | id | num | ; | , | = | if | else | while | + | - | * | / | ( | ) | $ |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Prog** | Prod 1 | Prod 1 | | | | | | | | | | | | | | | |
-| **Decls** | Prod 2 | Prod 2 | | | | | | | | | | | | | | | |
-| **Decls'** | Prod 3 | Prod 3 | $\epsilon$ | | | | | $\epsilon$ | | $\epsilon$ | | | | | | | |
-| **Decl** | Prod 5 | Prod 5 | | | | | | | | | | | | | | | |
-| **Tipo** | Prod 6 | Prod 7 | | | | | | | | | | | | | | | |
-| **LVar** | | | Prod 8 | | | | | | | | | | | | | | |
-| **LVar'** | | | | | $\epsilon$ | Prod 9 | | | | | | | | | | | |
-| **Stmts** | | | Prod 11 | | | | | Prod 11 | | Prod 11 | | | | | | | |
-| **Stmts'** | | | Prod 12 | | | | | Prod 12 | $\epsilon$ | Prod 12 | | | | | | | $\epsilon$ |
-| **Stmt** | | | Prod 14 | | | | | Prod 15 | | Prod 16 | | | | | | | |
-| **Expr** | | | Prod 17 | Prod 17 | | | | | | | | | | | Prod 17 | | |
-| **Expr'** | | | | | $\epsilon$ | | | | | | Prod 18 | Prod 19 | | | | $\epsilon$ | |
-| **Term** | | | Prod 21 | Prod 21 | | | | | | | | | | | Prod 21 | | |
-| **Term'** | | | | | $\epsilon$ | | | | | | $\epsilon$ | $\epsilon$ | Prod 22 | Prod 23 | | $\epsilon$ | |
-| **Factor**| | | Prod 26 | Prod 27 | | | | | | | | | | | Prod 25 | | |
-
----
+| **Prog** | P 1 | P 1 | | | | | | | | | | | | | | | |
+| **Decls** | P 2 | P 2 | | | | | | | | | | | | | | | |
+| **Decls'** | P 3 | P 3 | epsilon | | | | | epsilon | | epsilon | | | | | | | |
+| **Decl** | P 5 | P 5 | | | | | | | | | | | | | | | |
+| **Tipo** | P 6 | P 7 | | | | | | | | | | | | | | | |
+| **LVar** | | | P 8 | | | | | | | | | | | | | | |
+| **LVar'** | | | | | epsilon | P 9 | | | | | | | | | | | |
+| **Stmts** | | | P 11 | | | | | P 11 | | P 11 | | | | | | | |
+| **Stmts'** | | | P 12 | | | | | P 12 | epsilon | P 12 | | | | | | | epsilon |
+| **Stmt** | | | P 14 | | | | | P 15 | | P 16 | | | | | | | |
+| **Expr** | | | P 17 | P 17 | | | | | | | | | | | P 17 | | |
+| **Expr'** | | | | | epsilon | | | | | | P 18 | P 19 | | | | epsilon | |
+| **Term** | | | P 21 | P 21 | | | | | | | | | | | P 21 | | |
+| **Term'** | | | | | epsilon | | | | | | epsilon | epsilon | P 22 | P 23 | | epsilon | |
+| **Factor**| | | P 26 | P 27 | | | | | | | | | | | P 25 | | |
 
 5. Sustituir el contenido del Analizador Léxico (lexer.ll) con el implementado en la segunda práctica. (0.5 pts.)
-
-El analizador sintáctico se implementó utilizando el algoritmo de descenso predictivo guiado por tabla en C++.
-
 * Se definieron los enumeradores `Token` y `NoTerm` en `Symbols.hpp`.
 * Se cargó la gramática $G'$ y la tabla predictiva $M$ en `ParserLL::loadTable`.
 * El método `ParserLL::parse` utiliza una pila explícita para validar la cadena de entrada contra las producciones.
-
-### Pruebas Realizadas
-El parser aceptó correctamente el archivo de prueba base y se generaron casos adicionales para validar la robustez (archivos `test_valid_1`, `test_invalid_1`, etc.).
 
 6. Definir en un comentario de _Symbols.hpp_ la gramática _G'_. (0.05 pts.)
 7. Definir _Σ_ en un _**enum**_ de _Symbols.hpp_. (0.10 pts.)
