@@ -1,0 +1,3 @@
+int contador;
+contador = 0;
+while (contador) contador = contador + 1;

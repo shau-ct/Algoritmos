@@ -1,0 +1,9 @@
+int x, y;
+float z;
+x = 10;
+if (x) 
+    y = x + 1;
+else 
+    y = x - 1;
+while (y) 
+    z = z * 2;

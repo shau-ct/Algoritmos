@@ -1,0 +1,4 @@
+int x, y;
+float z;
+x = 10;
+if (x) y = 2; else y = 3;
